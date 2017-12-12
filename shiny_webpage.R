@@ -12,6 +12,23 @@ setwd(wd)
 idig<-na.omit(read.csv('pheno_specimen.csv'))
 colnames(idig)[7]<-'long'
 
+pecs<-read.csv('data/pectoralFin-ontotrace.csv',sep='\t')
+colnames(pecs)<-c('pub','vto','vto_label','matrix_taxon','taxon_comment','specimens','state')
+pecs$state<-as.character(pecs$state)
+
+overlap<-matrix(nrow=)
+
+idig$pecs<-c(rep(NA,nrow(idig)))
+
+for(i in levels(idig$vto_label)){
+  if(i %in% pecs$vto_label){
+    idig$pecs[idig$vto_label==i]<-pecs$state[pecs$vto_label==i]
+  }
+  
+}
+
+idig_small<-na.omit(idig)
+
 
 ##############
 ## plot data by coords
@@ -35,7 +52,7 @@ ui<-fluidPage(
 
 server <- function(input, output) {
   output$map <- renderPlot({
-    worldmap + geom_point(data=subset(idig,genus %in% input$taxa),aes(x=long,y=lat,color=genus))
+    worldmap + geom_point(data=subset(idig_small,genus %in% input$taxa),aes(x=long,y=lat,color=genus,shape=pecs))
   })
 }
 

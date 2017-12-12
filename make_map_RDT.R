@@ -32,16 +32,23 @@ setwd(wd)
 idig<-na.omit(read.csv('pheno_specimen.csv'))
 colnames(idig)[7]<-'long'
 
+
 ##############
 ## load in data from phenoscape
 pecs<-read.csv('data/pectoralFin-ontotrace.csv',sep='\t')
-merge(pecs,idig)
+colnames(pecs)<-c('pub','vto','vto_label','matrix_taxon','taxon_comment','specimens','state')
+pecs$state<-as.character(pecs$state)
 
-###################
-## make a map of your points
+overlap<-matrix(nrow=)
 
-# par(mfrow=c(1,1), mar=c(4,4,1,1))
+idig$pecs<-c(rep(NA,nrow(idig)))
 
+for(i in levels(idig$vto_label)){
+  if(i %in% pecs$vto_label){
+    idig$pecs[idig$vto_label==i]<-pecs$state[pecs$vto_label==i]
+  }
+  
+}
 
 
 
