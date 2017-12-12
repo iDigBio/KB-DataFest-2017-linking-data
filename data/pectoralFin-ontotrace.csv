@@ -2307,8 +2307,3 @@ Chrysichthys platycephalus	VTO:0059235	Chrysichthys platycephalus	null	null		1
 Saccodon wagneri	VTO:0064974	Saccodon wagneri	null	null		1
 Lefua costata	VTO:0041262	Lefua costata	null	null		1
 Simpsonichthys cholopteryx	VTO:0070997	Simpsonichthys cholopteryx	null	null		1
-
-
-Character Number	Character Description	Character Comment	State Number	State Description	State Comment	Entity	Entity label	Quality	Quality label	Character Attribute	Attribute label	Related Entity	Related Entity label	Count	Comment
-1	pectoral fin		0	absent	
-1	pectoral fin		1	present	

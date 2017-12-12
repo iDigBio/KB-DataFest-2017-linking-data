@@ -3,7 +3,6 @@ library(shiny)
 ##########
 
 ### set working directory
-#wd <- "/home/blubb/Documents/R/"
 wd <- "/Users/RDT/Documents/Extracurricular/Phenoscape"
 setwd(wd)
 
