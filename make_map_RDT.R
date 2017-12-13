@@ -96,8 +96,10 @@ hm$value[hm$value=='1 and 0'] <- '0 and 1'
 
 ## barplot
 chars<-ggplot(hm, aes(variable,genus,fill=value)) + geom_tile() + 
-  scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous'))
-specimens<-ggplot(hm, aes(variable,genus,fill=count)) + geom_tile()
+  scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous')) +
+  labs(y=NULL) + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="bottom")
+specimens<-ggplot(hm, aes(' ',genus,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue') + 
+  theme(legend.position="bottom",axis.text.x=element_blank())
 
 plot_grid(specimens,chars)
 
