@@ -77,25 +77,23 @@ idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short')
 idig_chars_ott<-merge(idig_chars_merged,ott,by='vto_short')
 idig_chars_ott$genus_species<-paste(idig_chars_ott$genus,idig_chars_ott$specificepithet,sep=' ')
 
+# save a bit of working memory
+rm(idig)
+
 ####################
 ## make a heatmap with sum table
 
 ## melted version
-# hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus_species','count','ott_id'),measure.vars = c(char_names)) 
+hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus_species','count','ott_id'),measure.vars = c(char_names))
 # hm$value<-as.integer(hm$value)
 
-## version with text changed
-hm<-idig_chars_ott
-hm[,char_names]<-as.character(hm[,char_names])
-hm[hm=='1']<-'present'
-hm[hm=='0']<-'absent'
-hm[hm=='0 and 1']<-'ambiguous'
-hm[hm=='NA']<-'missing'
 
 # hm_spp<-ggplot(hm, aes(value,genus_species)) + geom_tile(aes(fill=count)) + scale_fill_gradient(low='white',high='blue') +
 #   facet_grid(~.variable)
 
-ggplot(hm, aes(char_sesamoid_bone_of_manus,family)) + geom_tile(aes(fill=count)) + scale_fill_continuous(low='white',high='blue')
+ggplot(idig_chars_ott, aes(char_sesamoid_bone_of_manus,family)) + geom_tile(aes(fill=count)) + 
+  scale_fill_continuous(low='white',high='blue') + 
+  scale_x_discrete(labels=c('1'='present','0'='absent','0 and 1'='ambiguous','NA'='missing'))
 
 ####################
 ## get the Open Tree of Life tree
