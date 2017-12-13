@@ -10,6 +10,7 @@
 # install.packages('rworldmap')
 # install.packages('mapproj')
 # install.packages('ggmap')
+# install.packages('dplyr')
 
 library(rotl)
 library(rgdal)
@@ -30,7 +31,9 @@ setwd(wd)
 
 ##############
 ## import data from idigbio
-idig<-na.omit(read.csv('../pheno_specimen_with_chars.csv'))
+idig<-read.csv('../pheno_specimen_with_chars.csv')
+idig[idig=='?'] <- NA
+
 # idig$genus_species<-as.factor(idig$genus_species)
 
 
@@ -39,22 +42,33 @@ idig<-na.omit(read.csv('../pheno_specimen_with_chars.csv'))
 char<-read.csv('data/fin-Ontotrace.txt',sep='\t')
 
 char[,c(3:5)]<-as.character(char[,c(3:5)])
+# 
+# idig$pelvic.fin<-c(rep(NA,nrow(idig)))
+# idig$pectoral.fin<-c(rep(NA,nrow(idig)))
+# idig$pelvic.sucking.disc<-c(rep(NA,nrow(idig)))
+# 
+# 
+# for(i in levels(idig$vto_short)){
+#   # print(i)
+#   if(i %in% char$Valid.Taxon){
+#     idig$pelvic.fin[idig$vto_short==i]<-char$pelvic.fin[char$Valid.Taxon==i]
+#     idig$pectoral.fin[idig$vto_short==i]<-char$pectoral.fin[char$Valid.Taxon==i]
+#     idig$pelvic.sucking.disc[idig$vto_short==i]<-char$pelvic.sucking.disc[char$Valid.Taxon==i]
+#   }
+#   
+# }
 
-idig$pelvic.fin<-c(rep(NA,nrow(idig)))
-idig$pectoral.fin<-c(rep(NA,nrow(idig)))
-idig$pelvic.sucking.disc<-c(rep(NA,nrow(idig)))
 
+####################
+## build a table with counts
 
-for(i in levels(idig$vto_short)){
-  # print(i)
-  if(i %in% char$Valid.Taxon){
-    idig$pelvic.fin[idig$vto_short==i]<-char$pelvic.fin[char$Valid.Taxon==i]
-    idig$pectoral.fin[idig$vto_short==i]<-char$pectoral.fin[char$Valid.Taxon==i]
-    idig$pelvic.sucking.disc[idig$vto_short==i]<-char$pelvic.sucking.disc[char$Valid.Taxon==i]
-  }
-  
-}
+char_names<-colnames(idig[grep("^char",colnames(idig))])
+idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n()) %>% as.data.frame()-> idig_sum
 
+merge(idig_sum,char)
+
+char_sesamoid_bone_of_manus,char_carpal_bone,char_humerus,
+char_ulna,char_radius_bone,char_centrale_fore,char_ulnare
 
 ####################
 ## get the Open Tree of Life tree
@@ -104,14 +118,19 @@ pecs_merged$tiplabel<-paste(pecs_merged$Valid.Taxon.label,paste('ott',pecs_merge
 
 ##############
 ## plot coordinates from idig
-
+subset(names(idig),'char' %in%)
+idig[grep("^char"),colnames(idig)]
 
 world <- map_data("world")
 
 worldmap <- ggplot() +  geom_path(data=world, aes(x=long, y=lat, group=group))+  scale_y_continuous(breaks=(-2:2) * 30) +
   scale_x_continuous(breaks=(-4:4) * 45) + theme_bw()
 
-worldmap + geom_point(data=idig, aes(x=lon,y=lat,color=genus,shape=pectoral.fin))
+idig_manus<-na.omit(subset(idig[,1:11]))
+
+worldmap + geom_point(data=idig_manus, aes(x=lon,y=lat,color=genus,shape=char_sesamoid_bone_of_manus))
+
+
 
 
 ##############
