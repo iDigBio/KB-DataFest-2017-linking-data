@@ -30,7 +30,7 @@ setwd(wd)
 
 ##############
 ## import data from idigbio
-idig<-na.omit(read.csv('../pheno_specimen.csv'))
+idig<-na.omit(read.csv('../pheno_specimen_with_chars.csv'))
 # idig$genus_species<-as.factor(idig$genus_species)
 
 
