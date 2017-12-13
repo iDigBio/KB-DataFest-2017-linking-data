@@ -19,6 +19,7 @@ library(ggplot2)
 library(mapproj)
 library(ggmap)
 library(dplyr)
+library(reshape2)
 
 ##########
 
@@ -36,12 +37,16 @@ idig[idig==''] <- NA
 
 # idig$genus_species<-as.factor(idig$genus_species)
 
+##############
+## import ott numbers
+ott<-read.csv('data/phenoscape_taxonomy_ottids.csv')
+
 
 ##############
 ## load in data from phenoscape
-char<-read.csv('data/fin-Ontotrace.txt',sep='\t')
-
-char[,c(3:5)]<-as.character(char[,c(3:5)])
+# char<-read.csv('data/fin-Ontotrace.txt',sep='\t')
+# 
+# char[,c(3:5)]<-as.character(char[,c(3:5)])
 # 
 # idig$pelvic.fin<-c(rep(NA,nrow(idig)))
 # idig$pectoral.fin<-c(rep(NA,nrow(idig)))
@@ -64,15 +69,28 @@ char[,c(3:5)]<-as.character(char[,c(3:5)])
 
 char_names<-colnames(idig[grep("^char",colnames(idig))])
 idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n()) %>% as.data.frame()-> idig_sum
-idig %>% group_by(vto_short) %>% select(char_names) %>% head() -> idig_charvals
-idig_chars_merged<-merge(idig_sum,idig_charvals) 
+idig %>% select(vto_short,char_names)  %>% unique() %>% as.data.frame() -> idig_charvals
+idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
+idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
+
+####################
+## make a heatmap with sum table
+
+head(idig_chars_merged)
+
+idig_chars_merged %>% select(vto_short,genus_species,count,char_names) %>% melt()
+
+melt(idig_chars_merged) %>% head()
+ggplot(idig_chars_merged) 
+
+
 
 ####################
 ## get the Open Tree of Life tree
-idig$genus_species<-paste(idig$genus,idig$specificepithet,sep=' ')
+idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
 
 
-taxa <- c(unique(idig$genus_species))
+taxa <- c(unique(idig_sum$genus_species))
 resolved_names <- tnrs_match_names(taxa) 
 taxon_search <- tnrs_match_names(taxa, context_name="All life")
 
@@ -115,7 +133,7 @@ pecs_merged$tiplabel<-paste(pecs_merged$Valid.Taxon.label,paste('ott',pecs_merge
 
 ##############
 ## plot coordinates from idig
-subset(names(idig),'char' %in%)
+# subset(names(idig),'char' %in%)
 idig[grep("^char"),colnames(idig)]
 
 world <- map_data("world")
