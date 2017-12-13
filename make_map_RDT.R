@@ -75,17 +75,17 @@ idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n
 idig %>% select(vto_short,char_names)  %>% unique() %>% as.data.frame() -> idig_charvals
 idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
 idig_chars_ott<-merge(idig_chars_merged,ott,by='vto_short')
-# idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
+idig_chars_ott$genus_species<-paste(idig_chars_ott$genus,idig_chars_ott$specificepithet,sep=' ')
 
 ####################
 ## make a heatmap with sum table
 
-head(idig_chars_merged)
+head(idig_chars_ott)
+idig_chars_ott[,char_names]<-as.character(idig_chars_ott[,char_names])
 
-idig_chars_merged %>% select(vto_short,genus_species,count,char_names) %>% melt()
+hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus_species','count','ott_id'),measure.vars = c(char_names)) 
 
-melt(idig_chars_merged) %>% head()
-ggplot(idig_chars_merged) 
+ggplot(hm, aes(genus_species,count)) + geom_tile(aes(fill=count)) 
 
 
 
