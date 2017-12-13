@@ -1,16 +1,5 @@
 library(shiny)
-library(ggplot2)
-library(dplyr)
-
-## DEPRECATED
-## List of all taxa in Phenoscape. Fix-up to make ordered for drop-downs
-## and chop out a string VTO to use to pick subsets from iDigBio points.
-#pheno_taxa <- read.csv("../data/queryResults_phenoscape_taxonomy_tiny.csv",
-#                      stringsAsFactors = FALSE)
-#pheno_taxa <- pheno_taxa %>%
-#  mutate(vto_short = gsub("_", ":", unlist(strsplit(vto, '/'))[[5]])) %>%
-#  arrange(vto_label)
-## The above mutate returns the same value for every row
+library(tidyr)
 
 # Pheno characters + iDigBio specimens joined by taxon
 pheno_specimens <- read.csv("../data/pheno_specimen_with_chars_tiny.csv", stringsAsFactors = FALSE)
@@ -19,9 +8,18 @@ pheno_specimens <- read.csv("../data/pheno_specimen_with_chars_tiny.csv", string
 distinct_taxa <- pheno_specimens %>% distinct(vto_short, vto_label)
 pheno_taxa_vector <- setNames(distinct_taxa[["vto_short"]], distinct_taxa[["vto_label"]])
 
+# Re-shape to long form to make filtering on characters possible
+pheno_specimens_long <- gather(pheno_specimens, character, value, char_sesamoid_bone_of_manus:char_pelvic_sucking_disc)
 
-# Global var for tracking what should be listed in the checkboxgroup
+# Calculate available characters
+pheno_chars_vector <- (pheno_specimens_long %>% distinct(character))[["character"]]
+
+# Global var of vto_shorts for tracking what should be listed in the checkboxgroup, 
+# requires elements to be labeled with vto_label for display
 active_taxa_vector <- c()
+
+# Global var of character column names
+active_chars_vector <- c()
 
 ##############
 ## plot data by coords
@@ -34,16 +32,30 @@ ui <- fluidPage(
   titlePanel("Phenomap"),
   
   fluidRow(
-    column(3, 
-           h2("Select Taxa"),
-           selectInput("selected_taxon", "", 
-                       choices=pheno_taxa_vector),
-           actionButton("add_taxon", "Add")
+    column(6, 
+           fluidRow(
+             column(6,
+                    h2("Select Taxa"),
+                    selectInput("selected_taxon", "", choices=pheno_taxa_vector),
+                    actionButton("add_taxon", "Add")
+             ),
+             column(6,
+                    h2("Active Taxa"),
+                    checkboxGroupInput("active_taxa", "", choices=active_taxa_vector)
+             )
            ),
-    column(3,
-           h2("Active Taxa"),
-           checkboxGroupInput("active_taxa", "", choices=active_taxa_vector)
-           ),
+           fluidRow(
+             column(6,
+                    h2("Select Characters"),
+                    selectInput("selected_char", "", choices=pheno_chars_vector),
+                    actionButton("add_character", "Add")
+             ),
+             column(6,
+                    h2("Active Characters"),
+                    checkboxGroupInput("active_chars", "", choices=active_chars_vector)
+             )
+           )
+    ),
     column(6,
            h2("Map"),
            plotOutput("map")
@@ -74,6 +86,14 @@ server <- function(input, output, session) {
     updateCheckboxGroupInput(session, "active_taxa", 
                              choices=active_taxa_vector,
                              selected=active_taxa_vector
+    )
+  })
+  
+  observeEvent(input$add_character, {
+    active_chars_vector <<- c(active_chars_vector, input$selected_char)
+    updateCheckboxGroupInput(session, "active_chars", 
+                             choices=active_chars_vector,
+                             selected=active_chars_vector
     )
   })
   
