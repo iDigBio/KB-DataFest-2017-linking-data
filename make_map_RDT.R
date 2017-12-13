@@ -32,6 +32,7 @@ setwd(wd)
 ## import data from idigbio
 idig<-read.csv('../pheno_specimen_with_chars.csv')
 idig[idig=='?'] <- NA
+idig[idig==''] <- NA
 
 # idig$genus_species<-as.factor(idig$genus_species)
 
