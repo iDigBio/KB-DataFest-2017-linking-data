@@ -20,6 +20,7 @@ library(mapproj)
 library(ggmap)
 library(dplyr)
 library(reshape2)
+library(cowplot)
 
 ##########
 
@@ -84,19 +85,21 @@ rm(idig)
 ## make a heatmap with sum table
 
 ## melted version
-hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus_species','count','ott_id'),measure.vars = c(char_names))
+hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus','genus_species','ott_id','count','vto_label'),
+         measure.vars = c(char_names)) %>% filter(value!='-60.0230556')
 # hm$value<-as.integer(hm$value)
+hm$value[hm$value=='1 and 0'] <- '0 and 1'
 
 
 # hm_spp<-ggplot(hm, aes(value,genus_species)) + geom_tile(aes(fill=count)) + scale_fill_gradient(low='white',high='blue') +
 #   facet_grid(~.variable)
 
-ggplot(idig_chars_ott, aes(char_sesamoid_bone_of_manus,vto_label)) + geom_tile(aes(fill=count)) + 
-  scale_fill_continuous(low='white',high='blue') + 
-  scale_x_discrete(labels=c('1'='present','0'='absent','0 and 1'='ambiguous','NA'='missing'))
-
 ## barplot
-ggplot(idig_chars_ott, aes(vto_label,color=char_sesamoid_bone_of_manus)) + geom_bar()
+chars<-ggplot(hm, aes(variable,genus,fill=value)) + geom_tile() + 
+  scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous'))
+specimens<-ggplot(hm, aes(variable,genus,fill=count)) + geom_tile()
+
+plot_grid(specimens,chars)
 
 ####################
 ## get the Open Tree of Life tree
