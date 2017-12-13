@@ -39,9 +39,9 @@ idig[idig==''] <- NA
 
 ##############
 ## load in data from phenoscape
-char<-read.csv('data/fin-Ontotrace.txt',sep='\t')
-
-char[,c(3:5)]<-as.character(char[,c(3:5)])
+# char<-read.csv('data/fin-Ontotrace.txt',sep='\t')
+# 
+# char[,c(3:5)]<-as.character(char[,c(3:5)])
 # 
 # idig$pelvic.fin<-c(rep(NA,nrow(idig)))
 # idig$pectoral.fin<-c(rep(NA,nrow(idig)))
@@ -69,10 +69,10 @@ idig_chars_merged<-merge(idig_sum,idig_charvals)
 
 ####################
 ## get the Open Tree of Life tree
-idig$genus_species<-paste(idig$genus,idig$specificepithet,sep=' ')
+idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
 
 
-taxa <- c(unique(idig$genus_species))
+taxa <- c(unique(idig_sum$genus_species))
 resolved_names <- tnrs_match_names(taxa) 
 taxon_search <- tnrs_match_names(taxa, context_name="All life")
 
@@ -115,7 +115,7 @@ pecs_merged$tiplabel<-paste(pecs_merged$Valid.Taxon.label,paste('ott',pecs_merge
 
 ##############
 ## plot coordinates from idig
-subset(names(idig),'char' %in%)
+# subset(names(idig),'char' %in%)
 idig[grep("^char"),colnames(idig)]
 
 world <- map_data("world")
