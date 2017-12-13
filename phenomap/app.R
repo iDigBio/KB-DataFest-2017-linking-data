@@ -1,8 +1,10 @@
 library(shiny)
 library(ggplot2)
 
-pheno_taxa = read.csv("../data/queryResults_phenoscape_taxonomy.csv",
+pheno_taxa <- read.csv("../data/queryResults_phenoscape_taxonomy.csv",
                       stringsAsFactors = FALSE)
+
+active_taxa_list <- c()
 
 ##############
 ## plot data by coords
@@ -31,7 +33,7 @@ ui <- fluidPage(
            ),
     column(6,
            h2("Map"),
-           plotOutput(outputId = "map")
+           plotOutput("map")
            )
   ),
   
@@ -47,11 +49,11 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   observeEvent(input$add_taxon, {
-    tc <- input$active_taxa
+    active_taxa_list <<- unique(c(active_taxa_list, input$selected_taxon))
     updateCheckboxGroupInput(session, "active_taxa", 
-                             choices=c(input$active_taxa, input$selected_taxon)
+                             choices=active_taxa_list
     )
-    print(paste(input$active_taxa))
+    print(active_taxa_list)
   })
   
   output$map <- renderPlot({
