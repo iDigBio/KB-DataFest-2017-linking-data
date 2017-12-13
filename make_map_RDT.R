@@ -41,6 +41,8 @@ idig[idig==''] <- NA
 ## import ott numbers
 ott<-read.csv('data/phenoscape_taxonomy_ottids.csv')
 colnames(ott)[2]<-'vto_short'
+ott$vto_short<-str_replace(ott$vto_short, '_',':')
+ott$vto_short<-str_replace(ott$vto_short, ' ','')
 
 
 ##############
@@ -73,7 +75,7 @@ idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n
 idig %>% select(vto_short,char_names)  %>% unique() %>% as.data.frame() -> idig_charvals
 idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
 idig_chars_ott<-merge(idig_chars_merged,ott,by='vto_short')
-idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
+# idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
 
 ####################
 ## make a heatmap with sum table
