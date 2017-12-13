@@ -91,9 +91,12 @@ hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus_species','count','
 # hm_spp<-ggplot(hm, aes(value,genus_species)) + geom_tile(aes(fill=count)) + scale_fill_gradient(low='white',high='blue') +
 #   facet_grid(~.variable)
 
-ggplot(idig_chars_ott, aes(char_sesamoid_bone_of_manus,family)) + geom_tile(aes(fill=count)) + 
+ggplot(idig_chars_ott, aes(char_sesamoid_bone_of_manus,vto_label)) + geom_tile(aes(fill=count)) + 
   scale_fill_continuous(low='white',high='blue') + 
   scale_x_discrete(labels=c('1'='present','0'='absent','0 and 1'='ambiguous','NA'='missing'))
+
+## barplot
+ggplot(idig_chars_ott, aes(vto_label,color=char_sesamoid_bone_of_manus)) + geom_bar()
 
 ####################
 ## get the Open Tree of Life tree
