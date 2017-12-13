@@ -1,4 +1,3 @@
-
 ##################
 # Hackathon Phenoscape
 # aim: map phenotypes onto a map
@@ -64,11 +63,8 @@ char[,c(3:5)]<-as.character(char[,c(3:5)])
 
 char_names<-colnames(idig[grep("^char",colnames(idig))])
 idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n()) %>% as.data.frame()-> idig_sum
-
-merge(idig_sum,char)
-
-char_sesamoid_bone_of_manus,char_carpal_bone,char_humerus,
-char_ulna,char_radius_bone,char_centrale_fore,char_ulnare
+idig %>% group_by(vto_short) %>% select(char_names) %>% head() -> idig_charvals
+idig_chars_merged<-merge(idig_sum,idig_charvals) 
 
 ####################
 ## get the Open Tree of Life tree
