@@ -18,6 +18,7 @@ library(rworldmap)
 library(ggplot2)
 library(mapproj)
 library(ggmap)
+library(dplyr)
 
 ##########
 
@@ -29,26 +30,30 @@ setwd(wd)
 
 ##############
 ## import data from idigbio
-idig<-na.omit(read.csv('../pheno_specimen_all.csv'))
-
+idig<-na.omit(read.csv('../pheno_specimen.csv'))
+# idig$genus_species<-as.factor(idig$genus_species)
 
 
 ##############
 ## load in data from phenoscape
-pecs<-read.csv('data/pectoralFin-ontotrace.csv',sep='\t')
-# colnames(pecs)<-c('pub','vto','vto_label','matrix_taxon','taxon_comment','specimens','state')
-pecs$X1<-as.character(pecs$X1)
+char<-read.csv('data/fin-Ontotrace.txt',sep='\t')
+
+char[,c(3:5)]<-as.character(char[,c(3:5)])
+
+idig$pelvic.fin<-c(rep(NA,nrow(idig)))
+idig$pectoral.fin<-c(rep(NA,nrow(idig)))
+idig$pelvic.sucking.disc<-c(rep(NA,nrow(idig)))
 
 
-idig$pecs<-c(rep(NA,nrow(idig)))
-
-for(i in levels(idig$vto_label)){
-  if(i %in% pecs$vto_label){
-    idig$pecs[idig$vto_label==i]<-pecs$state[pecs$Valid.Taxon.label==i]
+for(i in levels(idig$vto_short)){
+  # print(i)
+  if(i %in% char$Valid.Taxon){
+    idig$pelvic.fin[idig$vto_short==i]<-char$pelvic.fin[char$Valid.Taxon==i]
+    idig$pectoral.fin[idig$vto_short==i]<-char$pectoral.fin[char$Valid.Taxon==i]
+    idig$pelvic.sucking.disc[idig$vto_short==i]<-char$pelvic.sucking.disc[char$Valid.Taxon==i]
   }
   
 }
-
 
 
 ####################
@@ -57,7 +62,7 @@ idig$genus_species<-paste(idig$genus,idig$specificepithet,sep=' ')
 
 
 taxa <- c(unique(idig$genus_species))
-resolved_names <- tnrs_match_names(taxa)
+resolved_names <- tnrs_match_names(taxa) 
 taxon_search <- tnrs_match_names(taxa, context_name="All life")
 
 id <- ott_id(resolved_names)
@@ -68,6 +73,8 @@ typeof(id[[1]])
 
 tr <- tol_induced_subtree(ott_ids=id)
 plot(tr)
+
+
 
 
 ##############
@@ -89,6 +96,9 @@ idig_merged$tiplabel<-paste(idig_merged$genus,idig_merged$specificepithet,paste(
 ## make unique row names
 rownames(idig_merged)<-make.names(idig_merged$tiplabel,unique=TRUE)
 
+pecs_merged<-merge(pecs,keys)
+pecs_merged$tiplabel<-paste(pecs_merged$Valid.Taxon.label,paste('ott',pecs_merged$ott,sep=''),sep='_')
+
 ## make pseudotips on tree
 
 
@@ -101,7 +111,7 @@ world <- map_data("world")
 worldmap <- ggplot() +  geom_path(data=world, aes(x=long, y=lat, group=group))+  scale_y_continuous(breaks=(-2:2) * 30) +
   scale_x_continuous(breaks=(-4:4) * 45) + theme_bw()
 
-worldmap + geom_point(data=subset(idig_merged,genus=='scytalina'),aes(x=lon,y=lat,color=genus))
+worldmap + geom_point(data=idig, aes(x=lon,y=lat,color=genus,shape=pectoral.fin))
 
 
 ##############
