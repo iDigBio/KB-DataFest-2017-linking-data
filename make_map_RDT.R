@@ -40,6 +40,7 @@ idig[idig==''] <- NA
 ##############
 ## import ott numbers
 ott<-read.csv('data/phenoscape_taxonomy_ottids.csv')
+colnames(ott)[2]<-'vto_short'
 
 
 ##############
@@ -71,6 +72,7 @@ char_names<-colnames(idig[grep("^char",colnames(idig))])
 idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n()) %>% as.data.frame()-> idig_sum
 idig %>% select(vto_short,char_names)  %>% unique() %>% as.data.frame() -> idig_charvals
 idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
+idig_chars_ott<-merge(idig_chars_merged,ott)
 idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
 
 ####################
