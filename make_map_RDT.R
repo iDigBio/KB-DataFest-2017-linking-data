@@ -95,95 +95,111 @@ hm$value[hm$value=='1 and 0'] <- '0 and 1'
 #   facet_grid(~.variable)
 
 ## barplot
+x_charlabs<-str_replace_all(str_to_title(str_replace(char_names,'char_','')),'_',' ')
+
 chars<-ggplot(hm, aes(variable,family,fill=value)) + geom_tile() + 
   scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous')) +
-  labs(y=NULL,x='Phenoscape Character') + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="bottom")
-specimens<-ggplot(hm, aes(' ',family,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue') + 
-  theme(legend.position="bottom",axis.text.x=element_blank()) + labs(x='Number of Museum Specimens')
+  labs(y=NULL,x='Phenoscape Character') + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="top",
+                                                axis.text.x=element_text(angle=-90,hjust = 0)) + 
+  scale_x_discrete(labels=c(x_charlabs))
+specimens<-ggplot(hm, aes(' ',family,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue',breaks=c(1,10000)) + 
+  theme(legend.position="top",axis.text.x=element_blank(),legend.title = element_blank()) +  
+  labs(x='Number of Museum Specimens') 
 
-plot_grid(specimens,chars,rel_widths = c(1, 3))
+# plot_grid(specimens,chars,rel_widths = c(1, 3))
 
+# par(mfrow=c(1,2))
+
+library(gtable)
+library(grid)
+p1<-ggplotGrob(specimens)
+p2<-ggplotGrob(chars)
+p<-cbind(p1,p2, size='first')
+p$heights<-unit.pmax(p1$heights,p2$heights)
+grid.newpage()
+grid.draw(p)
+# gridExtra::grid.arrange(specimens,chars,nrow=1)
 
 
 ####################
 ## get the Open Tree of Life tree
-idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
-
-
-taxa <- c(unique(idig_sum$genus_species))
-resolved_names <- tnrs_match_names(taxa) 
-taxon_search <- tnrs_match_names(taxa, context_name="All life")
-
-id <- ott_id(resolved_names)
-
-typeof(id[[1]])
-
-# tr <- tol_subtree(ott_id = id[[1]])
-
-tr <- tol_induced_subtree(ott_ids=id)
-plot(tr)
-
-
-
-
-##############
-## pull ott codes to add to idig dataset
-
-codes<-matrix(nrow=length(id),ncol=2)
-colnames(codes)<-c('genus_species','ott')
-count=1
-for(i in names(id)){
-  codes[count,]<-c(as.character(i),id[i][[1]])
-  count=count+1
-}
-keys<-as.data.frame(codes)
-keys$genus_species<-str_to_lower(keys$genus_species)
-
-idig_merged<-merge(idig,keys)
-idig_merged$tiplabel<-paste(idig_merged$genus,idig_merged$specificepithet,paste('ott',idig_merged$ott,sep=''),sep='_')
-
-## make unique row names
-rownames(idig_merged)<-make.names(idig_merged$tiplabel,unique=TRUE)
-
-pecs_merged<-merge(pecs,keys)
-pecs_merged$tiplabel<-paste(pecs_merged$Valid.Taxon.label,paste('ott',pecs_merged$ott,sep=''),sep='_')
-
-## make pseudotips on tree
-
-
-##############
-## plot coordinates from idig
-# subset(names(idig),'char' %in%)
-idig[grep("^char"),colnames(idig)]
-
-world <- map_data("world")
-
-worldmap <- ggplot() +  geom_path(data=world, aes(x=long, y=lat, group=group))+  scale_y_continuous(breaks=(-2:2) * 30) +
-  scale_x_continuous(breaks=(-4:4) * 45) + theme_bw()
-
-idig_manus<-na.omit(subset(idig[,1:11]))
-
-worldmap + geom_point(data=idig_manus, aes(x=lon,y=lat,color=genus,shape=char_sesamoid_bone_of_manus))
-
-
-
-
-##############
-## plot occurence and phylo on map
-
-
-tree <- tr
-
-tiplabels <- tr$tip.label
-# sort(tiplabels)
-
-coords <- idig
-
-
-cord <- coords[tiplabels,]
-
-
-phylo.to.map(tree, coords)
+# idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
+# 
+# 
+# taxa <- c(unique(idig_sum$genus_species))
+# resolved_names <- tnrs_match_names(taxa) 
+# taxon_search <- tnrs_match_names(taxa, context_name="All life")
+# 
+# id <- ott_id(resolved_names)
+# 
+# typeof(id[[1]])
+# 
+# # tr <- tol_subtree(ott_id = id[[1]])
+# 
+# tr <- tol_induced_subtree(ott_ids=id)
+# plot(tr)
+# 
+# 
+# 
+# 
+# ##############
+# ## pull ott codes to add to idig dataset
+# 
+# codes<-matrix(nrow=length(id),ncol=2)
+# colnames(codes)<-c('genus_species','ott')
+# count=1
+# for(i in names(id)){
+#   codes[count,]<-c(as.character(i),id[i][[1]])
+#   count=count+1
+# }
+# keys<-as.data.frame(codes)
+# keys$genus_species<-str_to_lower(keys$genus_species)
+# 
+# idig_merged<-merge(idig,keys)
+# idig_merged$tiplabel<-paste(idig_merged$genus,idig_merged$specificepithet,paste('ott',idig_merged$ott,sep=''),sep='_')
+# 
+# ## make unique row names
+# rownames(idig_merged)<-make.names(idig_merged$tiplabel,unique=TRUE)
+# 
+# pecs_merged<-merge(pecs,keys)
+# pecs_merged$tiplabel<-paste(pecs_merged$Valid.Taxon.label,paste('ott',pecs_merged$ott,sep=''),sep='_')
+# 
+# ## make pseudotips on tree
+# 
+# 
+# ##############
+# ## plot coordinates from idig
+# # subset(names(idig),'char' %in%)
+# idig[grep("^char"),colnames(idig)]
+# 
+# world <- map_data("world")
+# 
+# worldmap <- ggplot() +  geom_path(data=world, aes(x=long, y=lat, group=group))+  scale_y_continuous(breaks=(-2:2) * 30) +
+#   scale_x_continuous(breaks=(-4:4) * 45) + theme_bw()
+# 
+# idig_manus<-na.omit(subset(idig[,1:11]))
+# 
+# worldmap + geom_point(data=idig_manus, aes(x=lon,y=lat,color=genus,shape=char_sesamoid_bone_of_manus))
+# 
+# 
+# 
+# 
+# ##############
+# ## plot occurence and phylo on map
+# 
+# 
+# tree <- tr
+# 
+# tiplabels <- tr$tip.label
+# # sort(tiplabels)
+# 
+# coords <- idig
+# 
+# 
+# cord <- coords[tiplabels,]
+# 
+# 
+# phylo.to.map(tree, coords)
 
 
 
