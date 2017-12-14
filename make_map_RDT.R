@@ -20,6 +20,7 @@ library(mapproj)
 library(ggmap)
 library(dplyr)
 library(reshape2)
+library(cowplot)
 
 ##########
 
@@ -41,6 +42,8 @@ idig[idig==''] <- NA
 ## import ott numbers
 ott<-read.csv('data/phenoscape_taxonomy_ottids.csv')
 colnames(ott)[2]<-'vto_short'
+ott$vto_short<-str_replace(ott$vto_short, '_',':')
+ott$vto_short<-str_replace(ott$vto_short, ' ','')
 
 
 ##############
@@ -72,18 +75,33 @@ char_names<-colnames(idig[grep("^char",colnames(idig))])
 idig %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n()) %>% as.data.frame()-> idig_sum
 idig %>% select(vto_short,char_names)  %>% unique() %>% as.data.frame() -> idig_charvals
 idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
-idig_chars_ott<-merge(idig_chars_merged,ott)
-idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
+idig_chars_ott<-merge(idig_chars_merged,ott,by='vto_short')
+idig_chars_ott$genus_species<-paste(idig_chars_ott$genus,idig_chars_ott$specificepithet,sep=' ')
+
+# save a bit of working memory
+rm(idig)
 
 ####################
 ## make a heatmap with sum table
 
-head(idig_chars_merged)
+## melted version
+hm<-melt(idig_chars_ott,id.vars=c('vto_short','family','genus','genus_species','ott_id','count','vto_label'),
+         measure.vars = c(char_names)) %>% filter(value!='-60.0230556')
+# hm$value<-as.integer(hm$value)
+hm$value[hm$value=='1 and 0'] <- '0 and 1'
 
-idig_chars_merged %>% select(vto_short,genus_species,count,char_names) %>% melt()
 
-melt(idig_chars_merged) %>% head()
-ggplot(idig_chars_merged) 
+# hm_spp<-ggplot(hm, aes(value,genus_species)) + geom_tile(aes(fill=count)) + scale_fill_gradient(low='white',high='blue') +
+#   facet_grid(~.variable)
+
+## barplot
+chars<-ggplot(hm, aes(variable,family,fill=value)) + geom_tile() + 
+  scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous')) +
+  labs(y=NULL,x='Phenoscape Character') + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="bottom")
+specimens<-ggplot(hm, aes(' ',family,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue') + 
+  theme(legend.position="bottom",axis.text.x=element_blank()) + labs(x='Number of Museum Specimens')
+
+plot_grid(specimens,chars,rel_widths = c(1, 3))
 
 
 
