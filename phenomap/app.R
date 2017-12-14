@@ -3,6 +3,18 @@ library(tidyr)
 library(gtable)
 library(grid)
 
+
+library(rotl)
+library(rgdal)
+library(stringr)
+library(rworldmap)
+library(ggplot2)
+library(mapproj)
+library(ggmap)
+library(dplyr)
+library(reshape2)
+
+
 # Data set of Phenoscape characters + iDigBio specimens joined by taxon. See 
 # https://github.com/phenoscape/KB-DataFest-2017-linking-data/blob/master/Build_Specimen_List_by_Taxonomy.ipynb
 # Full dataset available from: http://elk.acis.ufl.edu/pheno_specimen_with_chars.csv.gz
@@ -59,17 +71,16 @@ hm<-melt(pheno_specimens_chars_ott,id.vars=c('vto_short','family','genus','genus
 hm$value[hm$value=='1 and 0'] <- '0 and 1'
 
 # Tree data setup
-char_names<-colnames(pheno_specimens[grep("^char",colnames(idig))])
-pheno_specimens %>%  group_by(vto_short,family,genus,specificepithet) %>% summarize(count=n()) %>% as.data.frame()-> idig_sum
-pheno_specimens %>% select(vto_short,char_names)  %>% unique() %>% as.data.frame() -> idig_charvals
+
+ott<-read.csv('../data/phenoscape_taxonomy_ottids.csv', stringsAsFactors=FALSE)
+colnames(ott)[2]<-'vto_short'
 
 ott$vto_short <-  stringr::str_replace(ott$vto_short, ' ', '' )
 ott$vto_short <-  stringr::str_replace(ott$vto_short, '_', ':' )
 
 
-idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
-idig_chars_ott<-merge(idig_chars_merged,ott)
-idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
+pheno_specimens_chars_ott<-merge(pheno_specimens_chars_merged,ott)
+pheno_specimens_sum$genus_species<-paste(pheno_specimens_sum$genus,pheno_specimens_sum$specificepithet,sep=' ')
 
 
 
@@ -195,19 +206,19 @@ server <- function(input, output, session) {
   
   output$phylogeny <- renderPlot({
     print(input$selected_char)
-    idig_otol_subset <- idig_chars_merged[which(ott$vto_short %in% idig_chars_merged$vto_short),]
-    ott_l <- ott[which(ott$vto_short %in% idig_otol_subset$vto_short),]
+    pheno_specimens_otol_subset <- pheno_specimens_chars_merged[which(ott$vto_short %in% pheno_specimens_chars_merged$vto_short),]
+    ott_l <- ott[which(ott$vto_short %in% pheno_specimens_otol_subset$vto_short),]
     ott_l <- ott_l[,4]
     ol <- str_replace(ott_l, 'ott', '')
     
     
     ol <- as.numeric(ol)
-    excl <- c(609231, 87893, 618300, 933436)
+    excl <- c(609231, 87893, 618300, 933436, 303038, 460871, 348162, 348162, 363181, 363181, 734459, 892956, 892956, 214115, 258647, 883411, 883411)
     
     for (item in excl){
       ol <- ol[ol != item]
     }
-    
+    ol<-c(na.omit(as.numeric(ol)))
     
     tr <- tol_induced_subtree(ott_ids=ol)
     plot(tr)
