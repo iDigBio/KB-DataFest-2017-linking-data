@@ -18,7 +18,7 @@ char_sub <- idig_chars_ott[which(idig_chars_ott$ott_id %in% tll), ]
 
 
 char_unique<- unique(char_sub[, c(1,7,8,9,10,11,12,13,14,15, 16, 17, 18, 19, 20, 22 )])
-rownames(char_unique) <- char_unique$ott_id
+#rownames(char_unique) <- char_unique$ott_id
 
 
 char_unique2 <- subset(char_unique, !duplicated(ott_id))
@@ -71,3 +71,4 @@ p9 <-  gheatmap(p8, sort_char[colnames(sort_char)[grep('^char', colnames(sort_ch
 
 # plot
 plot(p9)
+
