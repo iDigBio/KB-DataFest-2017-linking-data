@@ -11,6 +11,9 @@ for (item in tl){
 tr$tip.label <- tll
 
 #
+idig_chars_merged<-merge(idig_sum,idig_charvals,by='vto_short') 
+idig_chars_ott<-merge(idig_chars_merged,ott)
+idig_sum$genus_species<-paste(idig_sum$genus,idig_sum$specificepithet,sep=' ')
 
 idig_chars_ott$ott_id  <- str_replace(idig_chars_ott$ott_id , ' ', '')
 
