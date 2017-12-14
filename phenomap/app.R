@@ -1,8 +1,12 @@
 library(shiny)
 library(tidyr)
 
-# Pheno characters + iDigBio specimens joined by taxon
+# Data set of Phenoscape characters + iDigBio specimens joined by taxon. See 
+# https://github.com/phenoscape/KB-DataFest-2017-linking-data/blob/master/Build_Specimen_List_by_Taxonomy.ipynb
+# Full dataset available from: http://elk.acis.ufl.edu/pheno_specimen_with_chars.csv.gz
 pheno_specimens <- read.csv("../data/pheno_specimen_with_chars_tiny.csv", stringsAsFactors = FALSE)
+pheno_specimens[pheno_specimens=='?'] <- NA
+pheno_specimens[pheno_specimens==''] <- NA
 
 # Re-shape to long form to make filtering on characters possible, remove NAs since the wide
 # matrix may have been sparse.
@@ -14,25 +18,25 @@ pheno_specimens_long <- gather(pheno_specimens, character, value,
 taxa_chars_index <- pheno_specimens_long %>%
                        distinct(vto_short, vto_label, character)
 
-# Calculate the taxonomy list from unique entries in the index
-distinct_taxa <- taxa_chars_index %>% distinct(vto_short, vto_label)
+# Calculate the list of all taxonomy from unique entries in the index
+distinct_taxa <- taxa_chars_index %>% 
+                     distinct(vto_short, vto_label) %>%
+                     arrange(vto_label)
 pheno_taxa_vector <- setNames(distinct_taxa[["vto_short"]], distinct_taxa[["vto_label"]])
 
 # Global var of vto_shorts for tracking what should be listed in the checkboxgroup, 
 # requires elements to be labeled with vto_label for display
 active_taxa_vector <- c()
+# Hard-code xamples for the demo, also pick the first item in the list from full data set
+active_taxa_vector <- setNames(c("VTO:0062083","VTO:0043441"), c("Adontosternarchus sachsi", "Anabantidae"))
 
-
-
-##############
-## plot data by coords
+# Map data and setup
 world <- map_data("world")
-
 map_height = 600
+
 
 ui <- fluidPage(
   
-  # App title ----
   titlePanel("Phenomap"),
   
   fluidRow(
@@ -53,8 +57,6 @@ ui <- fluidPage(
              column(12,
                     h2("Select Character"),
                     selectInput("selected_char", "", choices=c())
-                    # No longer allowin selection of multiple characters
-                    #actionButton("add_character", "Add")
              )
            )
     ),
@@ -75,7 +77,6 @@ ui <- fluidPage(
 )
 
 
-
 server <- function(input, output, session) {
   
   observeEvent(input$clear_taxa, {
@@ -91,7 +92,7 @@ server <- function(input, output, session) {
       input$selected_taxon,
       (distinct_taxa %>% filter(vto_short == input$selected_taxon))[["vto_label"]]
     )
-    active_taxa_vector <<- c(active_taxa_vector, new_choice) # used to have unique() here but that function eats names of elements
+    active_taxa_vector <<- c(active_taxa_vector, new_choice) # used to have unique() here to prevent multiple additions but that function eats names of elements
     updateCheckboxGroupInput(session, "active_taxa", 
                              choices=active_taxa_vector,
                              selected=active_taxa_vector
