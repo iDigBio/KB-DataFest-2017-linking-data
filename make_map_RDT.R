@@ -98,27 +98,17 @@ hm$value[hm$value=='1 and 0'] <- '0 and 1'
 x_charlabs<-str_replace_all(str_to_title(str_replace(char_names,'char_','')),'_',' ')
 
 chars<-ggplot(hm, aes(variable,family,fill=value)) + geom_tile() + 
-  scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous')) +
+  scale_fill_discrete(na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous'),name='Character State: ') +
   labs(y=NULL,x='Phenoscape Character') + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="top",
                                                 axis.text.x=element_text(angle=-90,hjust = 0)) + 
   scale_x_discrete(labels=c(x_charlabs))
-specimens<-ggplot(hm, aes(' ',family,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue',breaks=c(1,10000)) + 
-  theme(legend.position="top",axis.text.x=element_blank(),legend.title = element_blank()) +  
-  labs(x='Number of Museum Specimens') 
+specimens<-ggplot(hm, aes(' ',family,fill=count)) + geom_tile() + 
+  scale_fill_gradient(trans="log",low='white',high='blue',breaks=c(1,10000)) + 
+  theme(legend.position="top",legend.title = element_blank(),axis.text.x=element_text(angle=-90,hjust = 0),
+        axis.title.x = element_blank()) +
+  scale_x_discrete(labels='Number of Museum Specimens')
 
-# plot_grid(specimens,chars,rel_widths = c(1, 3))
-
-# par(mfrow=c(1,2))
-
-library(gtable)
-library(grid)
-p1<-ggplotGrob(specimens)
-p2<-ggplotGrob(chars)
-p<-cbind(p1,p2, size='first')
-p$heights<-unit.pmax(p1$heights,p2$heights)
-grid.newpage()
-grid.draw(p)
-# gridExtra::grid.arrange(specimens,chars,nrow=1)
+plot_grid(specimens,chars,rel_widths = c(1, 3),align='h')
 
 
 ####################
