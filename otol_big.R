@@ -146,19 +146,10 @@ for (item in tl){
 head(idig_chars_ott$ott_id)
 head(tll)
 
-
-typeof(tll[[1]])
-typeof(tll[[1]])
-typeof(idig_chars_ott$ott_id[[1]])
-
 # 
 # idig_chars_ott$ott_id <- as.list(idig_chars_ott$ott_id)
 # tll <- as.list(tll)
 
-for (item in idig_chars_ott$ott_id ){
-  print(item)
-
-}
 
 idig_chars_ott$ott_id  <- str_replace(idig_chars_ott$ott_id , ' ', '')
 
@@ -171,69 +162,84 @@ char_unique<- unique(char_sub[, c(1,7,8,9,10,11,12,13,14,15, 16, 17, 18, 19, 20,
 tl_str <- unlist(tll)
 #tl_str <- as.list(tll)
 
-head(char_unique )
-typeof(char_unique$ott_id)
-typeof(tll[[1]])
+
 tr$tip.label <- tll
 
 ##################
-library(picante)
-trait.plot(tr, char_unique[14], cols = c("pink", "red", "blue"))
+# library(picante)
+# trait.plot(tr, char_unique[14], cols = c("pink", "red", "blue"))
 
 unique( char_unique$ott_id)
 
 char_unique2 <- char_unique[which(unique(char_unique$ott_id) %in% tll), ]
-rownames(char_unique2) <- tll
+rownames(char_unique2) <- char_unique2$ott_id
+
+sort_char <- char_unique2[tl_str, ]
 
 
-typeof(char_unique2[94,15])
 
-typeof(char_unique2[14])
+
+
+
+#sort phenotypes according to tip label
+
+head(tl_str)
+head(sort_char)
+
+
+
+
+ rownames(char_unique2) <- tll
 
 # 
-# #Create a factor for the example
-# levels(char_unique2)<-c(levels(char_unique2),"None")  #Add the extra level to your factor
-# char_unique2[is.na(char_unique2)] <- "None"           #Change NA to "None"
+# typeof(char_unique2[94,15])
 # 
-# is.na(char_unique2) <- 3
+# typeof(char_unique2[14])
 # 
-# for(item in char_unique2){
-#   print(item)
+# # 
+# # #Create a factor for the example
+# # levels(char_unique2)<-c(levels(char_unique2),"None")  #Add the extra level to your factor
+# # char_unique2[is.na(char_unique2)] <- "None"           #Change NA to "None"
+# # 
+# # is.na(char_unique2) <- 3
+# # 
+# # for(item in char_unique2){
+# #   print(item)
+# # 
+# # if (is.na(char_unique2[item])){
+# #   char_unique2[item] <- 5
+# # }
+# # }
+# # 
+# # 
+# # char_unique2[is.na(char_unique2)] <- "3"
+# # 
+# # 
 # 
-# if (is.na(char_unique2[item])){
-#   char_unique2[item] <- 5
-# }
-# }
+# 
+# is.na(char_unique2)
+# char_unique3 <- as.matrix(char_unique2)                     # conver to matrix
+# y <- which(is.na(char_unique2)==TRUE)         # get index of NA values
+# char_unique3[y] <- 7
+# 
+# typeof(rownames(char_unique3))
+# typeof(tr$tip.label)
+# 
+# tr_char <- as.character(tr$tip.label)
+# rownames(char_unique3) <- tr_char
+# 
+# char_unique4 <- as.data.frame(char_unique3)
+# char_unique3[14]
+# 
+# char14 <- list(char_unique4[14])
+# ##problem is that names(df) is null
+# 
+# trait_df$trait_df[sort(order(tr_char))]
 # 
 # 
-# char_unique2[is.na(char_unique2)] <- "3"
-# 
-# 
-
-
-is.na(char_unique2)
-char_unique3 <- as.matrix(char_unique2)                     # conver to matrix
-y <- which(is.na(char_unique2)==TRUE)         # get index of NA values
-char_unique3[y] <- 7
-
-typeof(rownames(char_unique3))
-typeof(tr$tip.label)
-
-tr_char <- as.character(tr$tip.label)
-rownames(char_unique3) <- tr_char
-
-char_unique4 <- as.data.frame(char_unique3)
-char_unique3[14]
-
-char14 <- list(char_unique4[14])
-##problem is that names(df) is null
-
-
-
-
-char_unique5 <- as.data.frame(lapply(char_unique4, unlist))
-trait_df <- char_unique5
-trait_df <- as.data.frame.numeric(trait_df)
+# char_unique5 <- as.data.frame(lapply(char_unique4, unlist))
+# trait_df <- char_unique5
+# trait_df <- as.data.frame.numeric(trait_df)
 
 # 
 # orderVector1
@@ -246,6 +252,88 @@ trait_df <- as.data.frame.numeric(trait_df)
 # # biocLite("BiocUpgrade") # you may need this
 # biocLite("ggtree")
 # library(ggtree)
+install.packages("Biostrings")
+
+library("colorspace")
+library("Biostrings")
+library("ape")
+library("ggplot2")
+library("ggtree")
+
+head(tl_str)
+head(sort_char)
+
+head(tr$tip.label)
+
+sort_char2 <- as.matrix(sort_char)                     # conver to matrix
+y <- which(is.na(sort_char2)==TRUE)         # get index of NA values
+sort_char2[y] <- 7
+
+typeof(sort_char2)
+sort_char2[,14 ]
+
+sc <- as.data.frame(sort_char2)
+
+
+
+
+
+
+
+
+p8 <- ggtree(tr) + 
+  xlim(0, 125) +
+  geom_tiplab(size=2, offset=17) 
+
+# add heatmap
+p9 <-  gheatmap(p8,  sc[,14 ] , offset=0.2, width=0.2, low="white", high="black", colnames_position = "top", font.size=2)
+
+# plot
+plot(p9)
+
+typeof(sc)
+typeof(traits)
+
+#############3
+# install from CRAN
+install.packages("phytools")
+
+# install from Bioconductor
+source("https://bioconductor.org/biocLite.R")
+biocLite("EBImage")
+biocLite("ggtree")
+
+# load packages
+library("phytools") # for sims and ASRs
+library("EBImage") # for images
+library("ggtree")
+
+# read the tree from GitHub
+tree <- read.nexus("https://raw.githubusercontent.com/rgriff23/Dissertation/master/Chapter_2/data/tree.nex")
+set.seed(23) # reproducible
+traits <- data.frame(fastBM(tree, nsim=5))
+
+# basic plot
+p8 <- ggtree(tree) + 
+  xlim(0, 125) +
+  geom_tiplab(size=2, offset=17) 
+
+# add heatmap
+p9 <-  gheatmap(p8, traits, offset=0.2, width=0.2, low="white", high="black", colnames_position = "top", font.size=2)
+
+# plot
+plot(p9)
+
+
+##############
+
+
+trpl <- ggtree(tr)
+
+  gheatmap(trpl, sort_char2[,14 ]  ) 
+
+
+
 plot_tree = ggplot(tr, layout = "fan", right = TRUE, size = 0.1)
 plot_tree %<+% trait_df$trait_df[,14:15] + geom_tippoint(aes(color = trait1, alpha = 0.5))
 
