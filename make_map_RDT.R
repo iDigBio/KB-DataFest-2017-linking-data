@@ -95,13 +95,15 @@ hm$value[hm$value=='1 and 0'] <- '0 and 1'
 #   facet_grid(~.variable)
 
 ## barplot
-chars<-ggplot(hm, aes(variable,genus,fill=value)) + geom_tile() + 
+chars<-ggplot(hm, aes(variable,family,fill=value)) + geom_tile() + 
   scale_fill_discrete( na.value = 'white',labels=c('1'='present','0'='absent','0 and 1'='ambiguous')) +
-  labs(y=NULL) + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="bottom")
-specimens<-ggplot(hm, aes(' ',genus,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue') + 
-  theme(legend.position="bottom",axis.text.x=element_blank())
+  labs(y=NULL,x='Phenoscape Character') + theme(axis.title.y=element_blank(),axis.text.y=element_blank(), legend.position="bottom")
+specimens<-ggplot(hm, aes(' ',family,fill=count)) + geom_tile() + scale_fill_gradient(trans="log",low='white',high='blue') + 
+  theme(legend.position="bottom",axis.text.x=element_blank()) + labs(x='Number of Museum Specimens')
 
-plot_grid(specimens,chars)
+plot_grid(specimens,chars,rel_widths = c(1, 3))
+
+
 
 ####################
 ## get the Open Tree of Life tree
