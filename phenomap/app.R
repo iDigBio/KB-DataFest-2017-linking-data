@@ -89,6 +89,10 @@ ui <- fluidPage(
   
   titlePanel("Phenomap"),
   
+  div(class = "header",
+      includeHTML("header.html")
+  ),
+  
   fluidRow(
     column(3, 
            fluidRow(
@@ -125,6 +129,9 @@ ui <- fluidPage(
            h2("Phylogeny"),
            plotOutput("phylogeny")
            )
+  ),
+  div(class = "footer",
+      includeHTML("footer.html")
   )
 )
 
