@@ -116,12 +116,6 @@ for (char in colnames(cleaned.df[c(5:18)]))
   char_absent <- subset(sub_char, sub_char[char]=="0")
   char_comb <-subset(sub_char, sub_char[char]=="0" || sub_char[char]=="1")
 
-  
-  library(RColorBrewer)
-  myColors <- brewer.pal(5,"Set1")
-  names(myColors) <- levels(char_comb[char])
-  colScale <- scale_colour_manual(name = "char",values = myColors)
-  
   char_comb$fchar <- factor(char_comb$char_humerus)
     
   worldmap <- ggplot() +  geom_path(data=world, aes(x=long, y=lat, group=group))+  scale_y_continuous(breaks=(-2:2) * 30) +
