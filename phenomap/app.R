@@ -18,7 +18,7 @@ library(reshape2)
 # Data set of Phenoscape characters + iDigBio specimens joined by taxon. See 
 # https://github.com/phenoscape/KB-DataFest-2017-linking-data/blob/master/Build_Specimen_List_by_Taxonomy.ipynb
 # Full dataset available from: http://elk.acis.ufl.edu/pheno_specimen_with_chars.csv.gz
-pheno_specimens <- read.csv("../data/pheno_specimen_with_chars_tiny.csv", stringsAsFactors = FALSE)
+pheno_specimens <- read.csv("data/pheno_specimen_with_chars_tiny.csv", stringsAsFactors = FALSE)
 pheno_specimens[pheno_specimens=='?'] <- NA
 pheno_specimens[pheno_specimens==''] <- NA
 
@@ -55,7 +55,7 @@ map_height = 600
 
 ##############
 ## import ott numbers
-ott<-read.csv('../data/phenoscape_taxonomy_ottids.csv')
+ott<-read.csv('data/phenoscape_taxonomy_ottids.csv')
 colnames(ott)[2]<-'vto_short'
 ott$vto_short<-str_replace(ott$vto_short, '_',':')
 ott$vto_short<-str_replace(ott$vto_short, ' ','')
@@ -72,7 +72,7 @@ hm$value[hm$value=='1 and 0'] <- '0 and 1'
 
 # Tree data setup
 
-ott<-read.csv('../data/phenoscape_taxonomy_ottids.csv', stringsAsFactors=FALSE)
+ott<-read.csv('data/phenoscape_taxonomy_ottids.csv', stringsAsFactors=FALSE)
 colnames(ott)[2]<-'vto_short'
 
 ott$vto_short <-  stringr::str_replace(ott$vto_short, ' ', '' )
