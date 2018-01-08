@@ -1,19 +1,21 @@
 library(shiny)
-library(tidyr)
-library(gtable)
-library(grid)
+library(tidyverse)
 
 
-library(rotl)
-library(rgdal)
-library(stringr)
-library(rworldmap)
-library(ggplot2)
-library(mapproj)
-library(ggmap)
-library(dplyr)
-library(reshape2)
+library(reshape2) # hm melt
 
+library(cowplot) # plot_grid
+library(rotl) # tol_induced_subtree
+
+#library(gtable)
+#library(grid)
+#library(rgdal)
+#library(stringr)
+#library(rworldmap)
+#
+#library(mapproj)
+#library(ggmap)
+#
 
 # Data set of Phenoscape characters + iDigBio specimens joined by taxon. See 
 # https://github.com/phenoscape/KB-DataFest-2017-linking-data/blob/master/Build_Specimen_List_by_Taxonomy.ipynb
