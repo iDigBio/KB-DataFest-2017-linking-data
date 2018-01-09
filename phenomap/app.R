@@ -7,6 +7,7 @@ library(reshape2) # hm melt
 library(cowplot) # plot_grid
 library(rotl) # tol_induced_subtree
 
+
 #library(gtable)
 #library(grid)
 #library(rgdal)
@@ -51,7 +52,7 @@ active_taxa_vector <- c()
 
 # Map data and setup
 world <- map_data("world")
-map_height = 600
+default_map_height = 600
 
 # Heat map setup
 
@@ -117,9 +118,8 @@ ui <- fluidPage(
            )
     ),
     column(9,
-           h2("Map of Selected Character for Active Taxa"),
-           div(style = paste0("height:", map_height, "px"), plotOutput("map"))
-           )
+      specimenMapUI(id="specimen_map", map_height=default_map_height)
+    )
   ),
   
   fluidRow(
@@ -176,19 +176,21 @@ server <- function(input, output, session) {
     
   })
 
-  output$map <- renderPlot({
-    map_points <- pheno_specimens_long %>%
-                    filter(vto_short %in% input$active_taxa) %>%
-                    filter(character %in% input$selected_char) %>%
-                    distinct(uuid, vto_label, lon, lat, value)
-    
-    worldmap <- ggplot() + 
-      geom_path(data=world, aes(x=long, y=lat, group=group)) +
-      scale_y_continuous(breaks=(-2:2) * 30) +
-      scale_x_continuous(breaks=(-4:4) * 45) +
-      theme_bw()
-    worldmap + geom_point(data=map_points, aes(x=lon, y=lat, color=value, shape=vto_label), size=5)
-  }, height=map_height)
+  
+  output$map <- callModule(specimenMap, "specimen_map", map_height=default_map_height)
+#  output$map <- renderPlot({
+#    map_points <- pheno_specimens_long %>%
+#                    filter(vto_short %in% input$active_taxa) %>%
+#                    filter(character %in% input$selected_char) %>%
+#                    distinct(uuid, vto_label, lon, lat, value)
+#    
+#    worldmap <- ggplot() + 
+#      geom_path(data=world, aes(x=long, y=lat, group=group)) +
+#      scale_y_continuous(breaks=(-2:2) * 30) +
+#      scale_x_continuous(breaks=(-4:4) * 45) +
+#      theme_bw()
+#    worldmap + geom_point(data=map_points, aes(x=lon, y=lat, color=value, shape=vto_label), size=5)
+#  }, height=map_height)
   
   
   output$heatmap <- renderPlot({
