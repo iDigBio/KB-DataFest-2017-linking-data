@@ -87,7 +87,7 @@ get_worldclim_prectemp <- function(data, topath=tempdir(), return=c("all","summa
 ################################
 library(raster)
 ####
-idig<-read.csv('./pheno_specimen_with_chars.csv', stringsAsFactors=FALSE)
+idig<-read.csv('data/pheno_specimen_with_chars.csv', stringsAsFactors=FALSE)
 idig[idig=='?'] <- NA
 idig[idig==''] <- NA
 

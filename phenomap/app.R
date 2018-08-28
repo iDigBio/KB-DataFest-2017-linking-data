@@ -14,6 +14,8 @@ library(ggmap)
 library(dplyr)
 library(reshape2)
 
+library(cowplot)
+
 
 # Data set of Phenoscape characters + iDigBio specimens joined by taxon. See 
 # https://github.com/phenoscape/KB-DataFest-2017-linking-data/blob/master/Build_Specimen_List_by_Taxonomy.ipynb
