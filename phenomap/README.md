@@ -26,3 +26,15 @@ data, which will allow to compare the sampling of the species to the range. Base
 on the species there shall be hyper links to the IDigBio specimens and 
 information where the specimens can be found in case people want to further 
 analyze the data.
+
+## Requirements
+
+install.packages("shiny")
+install.packages("tidyverse")
+install.packages("maps")
+install.packages("cowplot")
+install.packages("rotl")
+
+
+Set working directory to the <repostitory>/phenomap directory if it is not 
+already. The data files are loaded as "data/<CSV file>".
